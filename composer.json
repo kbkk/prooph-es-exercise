@@ -12,7 +12,10 @@
     "ramsey/uuid": "^3.7",
     "myclabs/php-enum": "^1.5",
     "prooph/event-sourcing": "^5.2",
-    "symfony/var-dumper": "^3.3"
+    "symfony/var-dumper": "^3.3",
+    "prooph/event-store": "^7.2",
+    "prooph/pdo-event-store": "^1.5",
+    "doctrine/dbal": "^2.6"
   },
   "autoload": {
     "psr-4": {
