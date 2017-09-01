@@ -44,3 +44,7 @@ $aggregateRepository = new AggregateRepository(
 );
 
 $accountRepository = new EventSourcedAccountRepository($aggregateRepository);
+$projectionManager = new \Prooph\EventStore\Pdo\Projection\MySqlProjectionManager(
+    $eventStore,
+    $conn->getWrappedConnection()
+);
