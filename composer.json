@@ -1,0 +1,22 @@
+{
+  "name": "dziad/es-exercise-1",
+  "type": "project",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "kbkk"
+    }
+  ],
+  "require": {
+    "moneyphp/money": "^3.0",
+    "ramsey/uuid": "^3.7",
+    "myclabs/php-enum": "^1.5",
+    "prooph/event-sourcing": "^5.2",
+    "symfony/var-dumper": "^3.3"
+  },
+  "autoload": {
+    "psr-4": {
+      "": "src/"
+    }
+  }
+}
