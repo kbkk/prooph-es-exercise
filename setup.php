@@ -1,6 +1,11 @@
 <?php
 
+use Librarian\Charging\Domain\Account;
+use Librarian\Charging\Infrastructure\EventSourcedAccountRepository;
 use Prooph\Common\Messaging\FQCNMessageFactory;
+use Prooph\EventSourcing\Aggregate\AggregateRepository;
+use Prooph\EventSourcing\Aggregate\AggregateType;
+use Prooph\EventSourcing\EventStoreIntegration\AggregateTranslator;
 use Prooph\EventStore\Pdo\PersistenceStrategy\MySqlSingleStreamStrategy;
 use Prooph\EventStore\Stream;
 use Prooph\EventStore\StreamName;
@@ -29,6 +34,13 @@ $eventStore = new \Prooph\EventStore\Pdo\MySqlEventStore(
 $streamName = new StreamName('event_stream');
 $singleStream = new Stream($streamName, new ArrayIterator());
 
-if(!$eventStore->hasStream($streamName))
+if (!$eventStore->hasStream($streamName))
     $eventStore->create($singleStream);
 
+$aggregateRepository = new AggregateRepository(
+    $eventStore,
+    AggregateType::fromAggregateRootClass(Account::class),
+    new AggregateTranslator()
+);
+
+$accountRepository = new EventSourcedAccountRepository($aggregateRepository);
