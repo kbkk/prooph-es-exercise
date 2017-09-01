@@ -45,7 +45,7 @@ class Account extends AggregateRoot
         $account = new self();
 
         $account->recordThat(
-          AccountCreated::create($id, $currency)
+            AccountCreated::create($id, $currency)
         );
 
         return $account;
@@ -62,6 +62,10 @@ class Account extends AggregateRoot
             throw new \DomainException();
         }
 
+        if (!$this->state->equals(AccountState::ACTIVE())) {
+            throw new \DomainException('Cannot charge an inactive account');
+        }
+
         $this->recordThat(
             AccountCharged::create($this->id, $moneyToCharge)
         );
@@ -73,6 +77,10 @@ class Account extends AggregateRoot
             throw new \DomainException();
         }
 
+        if (!$this->state->equals(AccountState::ACTIVE())) {
+            throw new \DomainException('Cannot discharge an inactive account');
+        }
+
         $this->recordThat(
             AccountDischarged::create($this->id, $moneyToDischarge)
         );
@@ -80,7 +88,7 @@ class Account extends AggregateRoot
 
     public function cancelDebt()
     {
-        if($this->balance->isPositive()) {
+        if ($this->balance->isPositive()) {
             throw new \DomainException('Cannot cancel a debt when account balance is positive');
         }
 
@@ -114,7 +122,7 @@ class Account extends AggregateRoot
      */
     protected function apply(AggregateChanged $event): void
     {
-        switch(get_class($event)) {
+        switch (get_class($event)) {
             case AccountActivated::class:
                 $this->state = AccountState::ACTIVE();
                 break;
@@ -125,7 +133,7 @@ class Account extends AggregateRoot
                 /**
                  * @var $event AccountCharged
                  */
-                $this->balance = $this->balance->add($event->money());
+                $this->balance = $this->balance->subtract($event->money());
                 break;
 
             case AccountDischarged::class:
@@ -133,7 +141,7 @@ class Account extends AggregateRoot
                  * @var $event AccountDischarged
                  */
 
-                $this->balance = $this->balance->subtract($event->money());
+                $this->balance = $this->balance->add($event->money());
                 break;
             case AccountCreated::class:
                 /**
