@@ -5,6 +5,7 @@ namespace Librarian\Charging\Domain;
 
 use Librarian\Charging\Domain\Event\AccountCharged;
 use Librarian\Charging\Domain\Event\AccountCreated;
+use Librarian\Charging\Domain\Event\AccountDischarged;
 use Money\Currency;
 use Money\Money;
 use Prooph\EventSourcing\AggregateChanged;
@@ -68,6 +69,10 @@ class Account extends AggregateRoot
         if (!$this->canBeDischarged($moneyToDischarge)) {
             throw new \DomainException();
         }
+
+        $this->recordThat(
+            AccountDischarged::create($this->id, $moneyToDischarge)
+        );
     }
 
     public function cancelDebt()
@@ -104,6 +109,13 @@ class Account extends AggregateRoot
                 $this->balance = $this->balance->add($event->money());
                 break;
 
+            case AccountDischarged::class:
+                /**
+                 * @var $event AccountDischarged
+                 */
+
+                $this->balance = $this->balance->subtract($event->money());
+                break;
             case AccountCreated::class:
                 /**
                  * @var $event AccountCreated

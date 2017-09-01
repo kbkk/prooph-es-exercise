@@ -8,9 +8,7 @@ $id = \Ramsey\Uuid\Uuid::uuid4();
 $currency = new \Money\Currency('PLN');
 $account = Account::create($id, $currency);
 
-for ($i = 0; $i < 10; $i++)
-{
-    $account->charge(\Money\Money::PLN(10 * $i));
-}
+$account->charge(\Money\Money::PLN(100));
+$account->discharge(\Money\Money::PLN(50));
 
 dump($account);
