@@ -3,8 +3,10 @@
 namespace Librarian\Charging\Domain;
 
 
+use Librarian\Charging\Domain\Event\AccountActivated;
 use Librarian\Charging\Domain\Event\AccountCharged;
 use Librarian\Charging\Domain\Event\AccountCreated;
+use Librarian\Charging\Domain\Event\AccountDeactivated;
 use Librarian\Charging\Domain\Event\AccountDebtCanceled;
 use Librarian\Charging\Domain\Event\AccountDischarged;
 use Money\Currency;
@@ -89,12 +91,16 @@ class Account extends AggregateRoot
 
     public function activate()
     {
-
+        $this->recordThat(
+            AccountActivated::create($this->id)
+        );
     }
 
     public function deactivate()
     {
-
+        $this->recordThat(
+            AccountDeactivated::create($this->id)
+        );
     }
 
     protected function aggregateId(): string
@@ -109,6 +115,12 @@ class Account extends AggregateRoot
     protected function apply(AggregateChanged $event): void
     {
         switch(get_class($event)) {
+            case AccountActivated::class:
+                $this->state = AccountState::ACTIVE();
+                break;
+            case AccountDeactivated::class:
+                $this->state = AccountState::INACTIVE();
+                break;
             case AccountCharged::class:
                 /**
                  * @var $event AccountCharged

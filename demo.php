@@ -11,5 +11,7 @@ $account = Account::create($id, $currency);
 $account->charge(\Money\Money::PLN(100));
 $account->discharge(\Money\Money::PLN(150));
 $account->cancelDebt();
+$account->deactivate();
+$account->activate();
 
 dump($account);
