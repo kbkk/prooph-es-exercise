@@ -9,6 +9,7 @@ $currency = new \Money\Currency('PLN');
 $account = Account::create($id, $currency);
 
 $account->charge(\Money\Money::PLN(100));
-$account->discharge(\Money\Money::PLN(50));
+$account->discharge(\Money\Money::PLN(150));
+$account->cancelDebt();
 
 dump($account);

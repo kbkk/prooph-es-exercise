@@ -5,6 +5,7 @@ namespace Librarian\Charging\Domain;
 
 use Librarian\Charging\Domain\Event\AccountCharged;
 use Librarian\Charging\Domain\Event\AccountCreated;
+use Librarian\Charging\Domain\Event\AccountDebtCanceled;
 use Librarian\Charging\Domain\Event\AccountDischarged;
 use Money\Currency;
 use Money\Money;
@@ -77,7 +78,13 @@ class Account extends AggregateRoot
 
     public function cancelDebt()
     {
+        if($this->balance->isPositive()) {
+            throw new \DomainException('Cannot cancel a debt when account balance is positive');
+        }
 
+        $this->recordThat(
+            AccountDebtCanceled::create($this->id)
+        );
     }
 
     public function activate()
@@ -124,6 +131,13 @@ class Account extends AggregateRoot
                 $this->state = AccountState::ACTIVE();
                 $this->id = $event->id();
 
+                break;
+
+            case AccountDebtCanceled::class:
+                /**
+                 * @var $event AccountDebtCanceled
+                 */
+                $this->balance = new Money(0, $this->balance->getCurrency());
                 break;
             default:
                 throw new \LogicException();
